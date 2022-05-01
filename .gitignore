@@ -1,0 +1,10 @@
+build.sh
+*.zip
+bin
+
+# data
+proxies.yaml
+Country.mmdb
+geoip.dat
+geosite.dat
+yacd

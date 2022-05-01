@@ -1,0 +1,65 @@
+proxies:
+  - name: DEFAULT-TROJAN
+    type: trojan
+    server: example.com
+    port: 443
+    password: uuid
+    udp: true
+    sni: example.com
+    skip-cert-verify: true
+  - name: DEFAULT-TROJAN-WS
+    type: trojan
+    server: example.com
+    port: 443
+    password: uuid
+    network: ws
+    sni: example.com
+    skip-cert-verify: true
+    udp: true
+    ws-opts:
+      path: /trojan
+      headers:
+        Host: example.com
+  - name: DEFAULT-VMESS
+    type: vmess
+    server: example.com
+    port: 80
+    uuid: uuid
+    alterId: 0
+    cipher: auto
+    udp: true
+    tls: false
+    skip-cert-verify: true
+    network: ws
+    ws-opts:
+      path: /vmess
+      headers:
+        Host: example.com
+  - name: DEFAULT-VMESS-TLS
+    type: vmess
+    server: example.com
+    port: 443
+    uuid: uuid
+    alterId: 0
+    cipher: auto
+    udp: true
+    tls: true
+    skip-cert-verify: true
+    servername: example.com
+    network: ws
+    ws-opts:
+      path: /vmess
+      headers:
+        Host: example.com
+
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - DIRECT
+      - REJECT
+
+rules:
+  - GEOSITE,category-ads-all,REJECT
+  - MATCH,PROXY
