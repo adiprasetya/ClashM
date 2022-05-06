@@ -19,6 +19,7 @@ mkdir -p "${MODPATH}/bin"
 mkdir -p "${MODPATH}/data"
 mkdir -p "${MODPATH}/run"
 mkdir -p "${MODPATH}/scripts"
+[[ ! -f "${MODPATH}/data/proxies.yaml" ]] && \
 cp -f "${MODPATH}/data/.example.yaml" "${MODPATH}/data/proxies.yaml"
 
 # replacing MOD ID

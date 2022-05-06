@@ -12,7 +12,6 @@ main() {
     echo -n "  - $i "
     curl -I $i &> /dev/null && echo "[Success]" || echo "[Failed]"
   done
-  echo "info: fisher finished"
 }
 
 main

@@ -1,10 +1,10 @@
 mode: rule
-log-level: warning
+tproxy-port: 7892
 ipv6: false
 geodata-mode: true
 external-controller: 127.0.0.1:9090
 external-ui: yacd
-tproxy-port: 7892
+log-level: warning
 
 dns:
   enable: true

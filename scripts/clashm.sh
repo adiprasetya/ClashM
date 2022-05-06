@@ -233,6 +233,10 @@ tun_setup() {
   fi
 }
 
+get_tun_mode() {
+  tun_mode="$(grep -A5 "tun" $CONFIG | awk '/enable/ {print $2}')"
+}
+
 config_merger() {
   echo "info: merging config"
   cp -f "$BASE" "$CONFIG" && echo "  - add base."
@@ -242,6 +246,9 @@ config_merger() {
 
 forward_device() {
   device="$(cat $CONFIG | grep device | awk '{print $2}')"
+  if [[ -z "$device" ]]; then
+    device="$(ip link show | grep -Eo '(utun|Meta)')"
+  fi
   iptables -I FORWARD -o "$device" -j ACCEPT
   iptables -I FORWARD -i "$device" -j ACCEPT
   [[ "$?" == "0" ]] && echo "info: interface $device forwarded."
@@ -259,31 +266,38 @@ start() {
   fi
 
   custom_script
-
   [[ "$MERGE_CONFIG" == "true" ]] && config_merger
-  tun_mode="$(grep -A5 "tun" $CONFIG | awk '/enable/ {print $2}')"
-  if [[ "$tun_mode" == "true" ]]; then
-    echo "info: using tun"
-    tun_setup
-  fi
+
+  get_tun_mode
+  [[ "$tun_mode" == "true" ]] && { echo "info: using tun"; tun_setup; }
 
   start_service
 
   if [[ "$tun_mode" == "true" ]]; then
     forward_device
   else
-    echo "info: using tproxy"
     tproxy_port="$(grep "tproxy-port" $CONFIG | awk -F ':' '{print $2}')"
     dns_port="$(grep "listen" $CONFIG | awk -F ':' '{print $3}')"
+    if [[ -z "$dns_port" ]]; then
+      echo "err: dns port not present!"
+      stop_service
+      exit 1
+    fi
+    if [[ -z "$tproxy_port" ]]; then
+      echo "err: tproxy port not present!"
+      stop_service
+      exit 1
+    fi
+    echo "info: using tproxy"
     start_tproxy
   fi
 }
 
 stop() {
-  tun_mode="$(grep -A5 "tun" $CONFIG | awk '/enable/ {print $2}')"
+  get_tun_mode
   if [[ "$tun_mode" != "true" ]]; then
-    echo "info: tproxy stopped"
     stop_tproxy
+    echo "info: tproxy stopped"
   fi
   stop_service
 }
