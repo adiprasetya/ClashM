@@ -1,6 +1,6 @@
 id=ClashM
 name=ClashM
-version=0.0.1
-versionCode=20220502
+version=0.1.0
+versionCode=20220512
 author=adiprasetya
 description=Clash (Meta) in Magisk with Services.

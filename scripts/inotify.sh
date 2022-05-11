@@ -1,9 +1,9 @@
 #!/system/bin/sh
 
-DIR="/data/adb/modules/REPLACE"
-SCRIPTS="$DIR/scripts"
+DIR="${0%/*}"
+. "$DIR/clashm.config"
 CLASHM="$SCRIPTS/clashm.sh"
-LOG="${DIR}/run/run.log"
+LOG="${RUN}/run.log"
 
 events=$1
 monitor_dir=$2

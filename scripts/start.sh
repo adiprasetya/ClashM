@@ -1,10 +1,7 @@
 #!/system/bin/sh
 
-DIR="/data/adb/modules/REPLACE"
-SCRIPTS="${DIR}/scripts"
-RUN="${DIR}/run"
-PID_FILE="${RUN}/clash.pid"
-RUN_FILE="${RUN}/run.log"
+DIR="${0%/*}"
+. "$DIR/clashm.config"
 
 wait_until_login() {
   # in case of /data encryption is disabled

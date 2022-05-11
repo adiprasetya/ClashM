@@ -1,28 +1,7 @@
 #!/system/bin/sh
 
-# >>> ClashM Configuration <<< #
-
-# Customizable
-MERGE_CONFIG="true" # AUTO MERGE BETWEEN BASE AND PROXIES
-FISHER="false" # FISHER WILL NOT WORK IF TERMUX DOES NOT INSTALLED!
-BIN_NAME="clash"
-ID="2022"
-
-# Advanced
-# DIR="${0%/*}"
-DIR="/data/adb/modules/REPLACE"
-DATA="${DIR}/data"
-CONFIG="${DATA}/config.yaml"
-BASE="${DATA}/base.yaml"
-PROXIES="${DATA}/proxies.yaml"
-RUN="${DIR}/run"
-PID_FILE="${RUN}/clash.pid"
-RUN_FILE="${RUN}/run.log"
-CORE_LOG_FILE="${RUN}/core.log"
-SCRIPTS="$DIR/scripts"
-BIN="$DIR/bin/$BIN_NAME"
-BUSYBOX="/data/adb/magisk/busybox"
-
+DIR="${0%/*}"
+. "$DIR/clashm.config"
 
 # >>> Do not touch! <<< #
 # Termux
@@ -33,13 +12,8 @@ else
   FISHER="false"
 fi
 
-# Bypass Private IP
-intranet=(0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.0.0/24 192.0.2.0/24 192.88.99.0/24 192.168.0.0/16 198.51.100.0/24 203.0.113.0/24 224.0.0.0/4 233.252.0.0/24 240.0.0.0/4 255.255.255.255/32)
-
-# Special AIDs (include/private/android_filesystem_config.h):
-AIDs=(1001 1002 1003 1004 1005 1006 1007 1008 1009 1010 1011 1012 1013 1014 1015 1016 1017 1018 1019 1020 1021 1022 1023 1024 1025 1026 1027 1028 1029 1030 1031 1032 1033 1034 1035 1036 1037 1038 1039 1040 1041 1042 1043 1044 1045 1046 1047 1048 1049 1050 2001 2002 3001 3002 3003 3004 3005 3006 3007 3008 3009 3010 9997 9998 9999)
-
-# Suitable iptables (https://github.com/Magisk-Modules-Repo/v2ray)
+# Suitable iptables
+# https://github.com/Magisk-Modules-Repo/v2ray/blob/e1c0885537e4094d785ad219372f04816c5a1d36/v2ray/scripts/v2ray.tproxy#L21
 iptables_version="$(iptables -V | grep -o "v1\.[0-9]")"
 if [[ "${iptables_version}" = "v1.4" ]]; then
   # fix options for lower version iptables
@@ -69,13 +43,12 @@ start_service() {
   fi
 
   chmod 0755 ${BIN}
-  ${BIN} -t -d ${DATA} > ${RUN}/config_error.log
+  ${BIN} -t -d ${DATA} > ${DATA}/config_error.log
   if [[ "$?" != "0" ]]; then
     echo "err: configuration check failed！"
     exit 1
   fi
 
-  echo ">>> Core Log <<<" > ${CORE_LOG_FILE}
   echo "Date: $(date +%F)" >> ${CORE_LOG_FILE}
   echo "Time: $(date +%R)" >> ${CORE_LOG_FILE}
   echo >> ${CORE_LOG_FILE}
@@ -83,7 +56,7 @@ start_service() {
   nohup ${BUSYBOX} setuidgid 0:3005 ${BIN} -d ${DATA} &>> ${CORE_LOG_FILE} &
   echo -n $! > ${PID_FILE}
   echo "info: clash core started."
-  rm -f ${RUN}/config_error.log
+  rm -f ${DATA}/config_error.log
 }
 
 stop_service() {
@@ -224,7 +197,7 @@ stop_tproxy() {
 }
 
 
-# functioning stuff
+
 tun_setup() {
   mkdir -p /dev/net
   if [[ ! -L /dev/net/tun ]]; then 
@@ -238,7 +211,7 @@ get_tun_mode() {
 }
 
 config_merger() {
-  echo "info: merging config"
+  echo "info: config merger."
   cp -f "$BASE" "$CONFIG" && echo "  - add base."
   echo >> "$CONFIG"
   cat "$PROXIES" >> "$CONFIG" && echo "  - merge proxies."
@@ -254,10 +227,6 @@ forward_device() {
   [[ "$?" == "0" ]] && echo "info: interface $device forwarded."
 }
 
-custom_script() {
-  [[ "$FISHER" == "true" ]] && $SCRIPTS/fisher.sh
-}
-
 start() {
   local pid=`cat ${PID_FILE} 2> /dev/null`
   if (cat /proc/${pid}/cmdline | grep -q ${BIN}); then
@@ -265,11 +234,11 @@ start() {
     exit 1
   fi
 
-  custom_script
+  before_start
   [[ "$MERGE_CONFIG" == "true" ]] && config_merger
 
   get_tun_mode
-  [[ "$tun_mode" == "true" ]] && { echo "info: using tun"; tun_setup; }
+  [[ "$tun_mode" == "true" ]] && { echo "info: using tun."; tun_setup; }
 
   start_service
 
@@ -288,7 +257,7 @@ start() {
       stop_service
       exit 1
     fi
-    echo "info: using tproxy"
+    echo "info: using tproxy."
     start_tproxy
   fi
 }
@@ -297,9 +266,15 @@ stop() {
   get_tun_mode
   if [[ "$tun_mode" != "true" ]]; then
     stop_tproxy
-    echo "info: tproxy stopped"
+    echo "info: tproxy stopped."
   fi
   stop_service
+}
+
+before_start() {
+  if [[ "$FISHER" == "true" ]]; then
+    $SCRIPTS/fisher.sh
+  fi
 }
 
 case "$1" in
@@ -310,6 +285,6 @@ case "$1" in
     stop
    ;;
   *)
-    echo "Usage: ClashM {start|stop}"
+    echo "Usage: $0 {start|stop}"
    ;;
 esac

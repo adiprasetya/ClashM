@@ -5,13 +5,15 @@ FISH=(
  "example.com"
 )
 
-main() {
-  echo "info: fisher begin"
-  which curl &> /dev/null || { echo "err: install curl!"; exit 1; }
+
+which curl &> /dev/null || { echo "Install curl!"; exit 1; }
+
+fishing() {
+  echo "info: fisher begin."
   for i in ${FISH[@]}; do
     echo -n "  - $i "
     curl -I $i &> /dev/null && echo "[Success]" || echo "[Failed]"
   done
 }
 
-main
+fishing
