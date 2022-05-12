@@ -49,7 +49,7 @@ start_service() {
     exit 1
   fi
 
-  echo "Date: $(date +%F)" >> ${CORE_LOG_FILE}
+  echo "Date: $(date +%F)" > ${CORE_LOG_FILE}
   echo "Time: $(date +%R)" >> ${CORE_LOG_FILE}
   echo >> ${CORE_LOG_FILE}
   ulimit -SHn 1000000
