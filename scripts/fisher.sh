@@ -12,7 +12,7 @@ fishing() {
   echo "info: fisher begin."
   for i in ${FISH[@]}; do
     echo -n "  - $i "
-    curl -I $i &> /dev/null && echo "[Success]" || echo "[Failed]"
+    curl -LI $i &> /dev/null && echo "[Success]" || echo "[Failed]"
   done
 }
 

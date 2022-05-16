@@ -1,6 +1,7 @@
 mode: rule
 tproxy-port: 7892
 ipv6: false
+tcp-concurrent: true # default false
 geodata-mode: true
 external-controller: 127.0.0.1:9090
 external-ui: yacd
@@ -11,8 +12,8 @@ dns:
   listen: 0.0.0.0:1053
   ipv6: false # when the false, response to AAAA questions will be empty
   enhanced-mode: fake-ip # redir-host # (not recommended)
-  # fake-ip-range: 198.18.0.1/16 # Fake IP addresses pool CIDR
-  # use-hosts: true # lookup hosts and return IP record
+  fake-ip-range: 28.0.0.0/8 # Fake IP addresses pool CIDR
+  use-hosts: true # lookup hosts and return IP record
   nameserver:
     - 1.1.1.1 # Cloudflare
     - 1.0.0.1 # Cloudflare

@@ -34,18 +34,21 @@ start_service() {
 
   if [[ ! -f "${BIN}" ]]; then
     echo "err: clash core is missing."
+    print_notification "Core is missing."
     exit 1
   fi
 
   if [[ ! -f ${CONFIG} ]]; then
-    echo "err: configuration file does not exist!！"
+    echo "err: configuration file does not exist!"
+    print_notification "Configuration file does not exist!"
     exit 1
   fi
 
   chmod 0755 ${BIN}
   ${BIN} -t -d ${DATA} > ${DATA}/config_error.log
   if [[ "$?" != "0" ]]; then
-    echo "err: configuration check failed！"
+    echo "err: configuration check failed!"
+    print_notification "Configuration check failed!"
     exit 1
   fi
 
@@ -197,7 +200,6 @@ stop_tproxy() {
 }
 
 
-
 tun_setup() {
   mkdir -p /dev/net
   if [[ ! -L /dev/net/tun ]]; then 
@@ -219,18 +221,37 @@ config_merger() {
 
 forward_device() {
   device="$(cat $CONFIG | grep device | awk '{print $2}')"
-  if [[ -z "$device" ]]; then
-    device="$(ip link show | grep -Eo '(utun|Meta)')"
+  if (ifconfig "$device" &> /dev/null); then
+    device="$(ifconfig | grep -Eo '(utun|Meta)')"
   fi
   iptables -I FORWARD -o "$device" -j ACCEPT
   iptables -I FORWARD -i "$device" -j ACCEPT
-  [[ "$?" == "0" ]] && echo "info: interface $device forwarded."
+  echo "info: interface $device forwarded."
+}
+
+port_verif() {
+  if [[ "$MERGE_CONFIG" == "true" ]]; then
+    TARGET="$BASE"
+  else
+    TARGET="$CONFIG"
+  fi
+  $BUSYBOX sed -i "s/.*#.*tproxy/tproxy/" "$TARGET" &> /dev/null
+  $BUSYBOX sed -i "s/.*#.*listen/  listen/" "$TARGET" &> /dev/null
+}
+
+print_notification() {
+  if [[ -f "$ICON" ]]; then
+    su -lp 2000 -c "cmd notification post -S bigtext -i "file://$ICON" -t 'ClashM' 'CM' '$@'" &> /dev/null
+  else
+    su -lp 2000 -c "cmd notification post -S bigtext -t 'ClashM' 'CM' '$@" &> /dev/null
+  fi
 }
 
 start() {
   local pid=`cat ${PID_FILE} 2> /dev/null`
   if (cat /proc/${pid}/cmdline | grep -q ${BIN}); then
     echo "info: clash core has been started."
+    print_notification "Core has been started."
     exit 1
   fi
 
@@ -238,37 +259,46 @@ start() {
   [[ "$MERGE_CONFIG" == "true" ]] && config_merger
 
   get_tun_mode
-  [[ "$tun_mode" == "true" ]] && { echo "info: using tun."; tun_setup; }
+  if [[ "$tun_mode" == "true" ]]; then
+    echo "info: using tun."
+    tun_setup
+  else
+    port_verif
+  fi
 
   start_service
 
   if [[ "$tun_mode" == "true" ]]; then
     forward_device
   else
-    tproxy_port="$(grep "tproxy-port" $CONFIG | awk -F ':' '{print $2}')"
     dns_port="$(grep "listen" $CONFIG | awk -F ':' '{print $3}')"
     if [[ -z "$dns_port" ]]; then
       echo "err: dns port not present!"
+      print_notification "DNS port not present!"
       stop_service
       exit 1
     fi
+    tproxy_port="$(grep "tproxy-port" $CONFIG | awk -F ':' '{print $2}')"
     if [[ -z "$tproxy_port" ]]; then
       echo "err: tproxy port not present!"
+      print_notification "TPROXY port not present!"
       stop_service
       exit 1
     fi
     echo "info: using tproxy."
     start_tproxy
   fi
+  print_notification "Services Started."
 }
 
 stop() {
   get_tun_mode
   if [[ "$tun_mode" != "true" ]]; then
     stop_tproxy
-    echo "info: tproxy stopped."
+    echo "info: tproxy iptables cleared."
   fi
   stop_service
+  print_notification "Services Stopped."
 }
 
 before_start() {

@@ -19,13 +19,16 @@ BIN="${MODPATH}/bin"
 RUN="${MODPATH}/run"
 SCRIPTS="${MODPATH}/scripts"
 
-ui_print "- data directory: $DATA"
+ui_print "- Data directory: $DATA"
 
 # setup environment
 if [[ -d "${DATA}" ]]; then
-  ui_print "- old data directory exists,"
-  ui_print "  moved to ${DATA}.bak"
-  [[ -d "${DATA}.bak" ]] && ui_print "- old $MODID.bak will replaced."
+  ui_print "- Old data directory exists,"
+  ui_print "  Moved to ${DATA}.bak"
+  if [[ -d "${DATA}.bak" ]]; then
+    ui_print "- Old $MODID.bak will replaced."
+    rm -rf "${DATA}.bak"
+  fi
   mv -f "${DATA}" "${DATA}.bak"
 fi
 mv -f "${MODPATH}/data" "${DATA}"
@@ -40,6 +43,6 @@ sed -i "s|REPLACE|$MODID|" "$MODPATH/scripts/clashm.config"
 
 # set environment permission
 set_perm_recursive "${MODPATH}" 0 0 0755 0644
-set_perm_recursive "${DATA}" 0 3005 0644 0644
+set_perm_recursive "${DATA}" 0 0 0644 0644
 set_perm_recursive "${MODPATH}/scripts" 0 3005 0755 0755
 set_perm_recursive "${MODPATH}/bin" 0 3005 0755 0755
