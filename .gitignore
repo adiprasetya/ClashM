@@ -4,7 +4,6 @@ bin
 
 # data
 proxies.yaml
-Country.mmdb
-geoip.dat
-geosite.dat
+*.mmdb
+*.dat
 yacd

@@ -19,6 +19,12 @@ wait_until_login() {
   rm -f "$TEST_FILE"
 }
 
+start_service() {
+  echo "true" > ${RUN_FILE}
+  chmod 644 ${RUN_FILE}
+  ${SCRIPTS}/clashm.sh start &> "$RUN_FILE"
+}
+
 wait_until_login
 
 [[ -f ${PID_FILE} ]] && rm -f ${PID_FILE}
@@ -26,7 +32,8 @@ wait_until_login
 chmod -R 0755 ${SCRIPTS}
 
 if [[ ! -f ${DIR}/manual ]]; then
-  true > ${RUN_FILE}
-  chmod 644 ${RUN_FILE}
-  ${SCRIPTS}/clashm.sh start &> "$RUN_FILE"
+  if [[ ! -f ${DIR}/disable ]]; then
+    start_service
+  fi
+  inotifyd "${SCRIPTS}/inotify.sh" "${MODDIR}" &> /dev/null &
 fi

@@ -229,14 +229,15 @@ forward_device() {
   echo "info: interface $device forwarded."
 }
 
-port_verif() {
-  if [[ "$MERGE_CONFIG" == "true" ]]; then
-    TARGET="$BASE"
-  else
-    TARGET="$CONFIG"
-  fi
-  $BUSYBOX sed -i "s/.*#.*tproxy/tproxy/" "$TARGET" &> /dev/null
-  $BUSYBOX sed -i "s/.*#.*listen/  listen/" "$TARGET" &> /dev/null
+port_opener() {
+  TARGET=("$BASE" "$CONFIG")
+  $BUSYBOX sed -i "s/.*#.*tproxy/tproxy/" ${TARGET[@]} &> /dev/null
+  $BUSYBOX sed -i "s/.*#.*listen/  listen/" ${TARGET[@]} &> /dev/null
+}
+
+port_verifier() {
+  [[ -z "$1" ]] && return 1
+  ss -ap | grep "$BIN_NAME" | grep -om1 "$1"
 }
 
 print_notification() {
@@ -255,7 +256,7 @@ start() {
     exit 1
   fi
 
-  before_start
+  [[ "$FISHER" == "true" ]] && fishing
   [[ "$MERGE_CONFIG" == "true" ]] && config_merger
 
   get_tun_mode
@@ -263,7 +264,7 @@ start() {
     echo "info: using tun."
     tun_setup
   else
-    port_verif
+    port_opener
   fi
 
   start_service
@@ -271,14 +272,17 @@ start() {
   if [[ "$tun_mode" == "true" ]]; then
     forward_device
   else
-    dns_port="$(grep "listen" $CONFIG | awk -F ':' '{print $3}')"
+    sleep 0.8
+
+    dns_port="$(port_verifier $(awk -F ':' '/listen/ {print $3}' "$CONFIG"))"
     if [[ -z "$dns_port" ]]; then
       echo "err: dns port not present!"
       print_notification "DNS port not present!"
       stop_service
       exit 1
     fi
-    tproxy_port="$(grep "tproxy-port" $CONFIG | awk -F ':' '{print $2}')"
+
+    tproxy_port="$(port_verifier $(awk -F ':' '/tproxy-port/ {print $2}' "$CONFIG"))"
     if [[ -z "$tproxy_port" ]]; then
       echo "err: tproxy port not present!"
       print_notification "TPROXY port not present!"
@@ -301,11 +305,15 @@ stop() {
   print_notification "Services Stopped."
 }
 
-before_start() {
-  if [[ "$FISHER" == "true" ]]; then
-    $SCRIPTS/fisher.sh
-  fi
+fishing() {
+  print_notification "Fishing..."
+  echo "info: fisher begin."
+  for i in ${FISH[@]}; do
+    echo -n "  - $i "
+    ping -w 1 -c 1 $i &> /dev/null && echo "[Success]" || echo "[Failed]"
+  done
 }
+
 
 case "$1" in
   start|s)
