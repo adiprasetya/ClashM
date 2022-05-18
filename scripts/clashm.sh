@@ -213,16 +213,21 @@ get_tun_mode() {
 }
 
 config_merger() {
-  echo "info: config merger."
-  cp -f "$BASE" "$CONFIG" && echo "  - add base."
+  echo "info: merge config."
+  cp -f "$BASE" "$CONFIG"
   echo >> "$CONFIG"
-  cat "$PROXIES" >> "$CONFIG" && echo "  - merge proxies."
+  cat "$PROXIES" >> "$CONFIG"
 }
 
 forward_device() {
-  device="$(cat $CONFIG | grep device | awk '{print $2}')"
-  if (ifconfig "$device" &> /dev/null); then
+  device="$(awk '/device/ {print $2}' "$CONFIG")"
+  sleep "$DELAY"
+  if ! (ifconfig "$device" &> /dev/null); then
     device="$(ifconfig | grep -Eo '(utun|Meta)')"
+  fi
+  if [[ -z "$device" ]]; then
+    echo "err: tun device interface not found."
+    return 1
   fi
   iptables -I FORWARD -o "$device" -j ACCEPT
   iptables -I FORWARD -i "$device" -j ACCEPT
@@ -272,7 +277,7 @@ start() {
   if [[ "$tun_mode" == "true" ]]; then
     forward_device
   else
-    sleep 0.8
+    sleep "$DELAY"
 
     dns_port="$(port_verifier $(awk -F ':' '/listen/ {print $3}' "$CONFIG"))"
     if [[ -z "$dns_port" ]]; then
