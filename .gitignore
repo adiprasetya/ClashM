@@ -6,4 +6,4 @@ bin
 proxies.yaml
 *.mmdb
 *.dat
-yacd
+dashboard

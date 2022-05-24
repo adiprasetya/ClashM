@@ -4,7 +4,7 @@ ipv6: false
 tcp-concurrent: true # default false
 geodata-mode: true
 external-controller: 127.0.0.1:9090
-external-ui: yacd
+external-ui: dashboard
 log-level: warning
 
 dns:
@@ -15,7 +15,7 @@ dns:
   fake-ip-range: 28.0.0.0/8 # Fake IP addresses pool CIDR
   use-hosts: true # lookup hosts and return IP record
   nameserver:
-    - tls://one.one.one.one # DNS over TLS
+    - tls://1dot1dot1dot1.cloudflare-dns.com # DNS over TLS
     - https://1.1.1.1/dns-query # DNS over HTTPS
     - 1.1.1.1 # Cloudflare
     - 1.0.0.1 # Cloudflare

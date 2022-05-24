@@ -15,12 +15,12 @@ fi
 # Suitable iptables
 # https://github.com/Magisk-Modules-Repo/v2ray/blob/e1c0885537e4094d785ad219372f04816c5a1d36/v2ray/scripts/v2ray.tproxy#L21
 iptables_version="$(iptables -V | grep -o "v1\.[0-9]")"
-if [[ "${iptables_version}" = "v1.4" ]]; then
+if [[ "${iptables_version}" == "v1.4" ]]; then
   # fix options for lower version iptables
   export ANDROID_DATA=/data
   export ANDROID_ROOT=/system
   iptables="iptables -w"
-elif [[ "${iptables_version}" = "v1.6" ]] || [[ "${iptables_version}" = "v1.8" ]]; then
+elif [[ "${iptables_version}" == "v1.6" ]] || [[ "${iptables_version}" == "v1.8" ]]; then
   iptables="iptables -w 100"
 else
   iptables="echo iptables"
@@ -56,7 +56,8 @@ start_service() {
   echo "Time: $(date +%R)" >> ${CORE_LOG_FILE}
   echo >> ${CORE_LOG_FILE}
   ulimit -SHn 1000000
-  nohup ${BUSYBOX} setuidgid 0:3005 ${BIN} -d ${DATA} &>> ${CORE_LOG_FILE} &
+  nohup ${BUSYBOX} setuidgid 0:3005 \
+  "${BIN}" -d "${DATA}" -f "${CONFIG}"  &>> ${CORE_LOG_FILE} &
   echo -n $! > ${PID_FILE}
   echo "info: clash core started."
   rm -f ${DATA}/config_error.log
@@ -161,8 +162,8 @@ start_tproxy() {
 
   ${iptables} -t nat -A OUTPUT -j CLASH_DNS_LOCAL
   
-#  ${iptables} -A OUTPUT -d 127.0.0.1 -p tcp -m owner --uid-owner 0 --gid-owner 3005 -m tcp --dport ${tproxy_port} -j REJECT
-# 本机直接访问 ${tproxy_port} 会回环. 见 https://github.com/Dreamacro/clash/issues/425
+  #  ${iptables} -A OUTPUT -d 127.0.0.1 -p tcp -m owner --uid-owner 0 --gid-owner 3005 -m tcp --dport ${tproxy_port} -j REJECT
+  # 本机直接访问 ${tproxy_port} 会回环. 见 https://github.com/Dreamacro/clash/issues/425
 
 }
 
@@ -221,9 +222,11 @@ config_merger() {
 
 forward_device() {
   device="$(awk '/device/ {print $2}' "$CONFIG")"
-  sleep "$DELAY"
-  if ! (ifconfig "$device" &> /dev/null); then
-    device="$(ifconfig | grep -Eo '(utun|Meta)')"
+  if [[ ! "$FORCE" == "true" ]]; then
+    sleep "$DELAY"
+    if ! (ifconfig "$device" &> /dev/null); then
+      device="$(ifconfig | grep -Eo '(utun|Meta)')"
+    fi
   fi
   if [[ -z "$device" ]]; then
     echo "err: tun device interface not found."
@@ -231,18 +234,45 @@ forward_device() {
   fi
   iptables -I FORWARD -o "$device" -j ACCEPT
   iptables -I FORWARD -i "$device" -j ACCEPT
-  echo "info: interface $device forwarded."
+  echo "info: $device tun interface forwarded."
 }
 
-port_opener() {
+comment_handler() {
   TARGET=("$BASE" "$CONFIG")
-  $BUSYBOX sed -i "s/.*#.*tproxy/tproxy/" ${TARGET[@]} &> /dev/null
-  $BUSYBOX sed -i "s/.*#.*listen/  listen/" ${TARGET[@]} &> /dev/null
+  if [[ "$1" == "tproxy" ]]; then
+    $BUSYBOX sed -i "s/.*tproxy/tproxy/" ${TARGET[@]} &> /dev/null
+    $BUSYBOX sed -i "s/.*listen/  listen/" ${TARGET[@]} &> /dev/null
+  elif [[ "$1" == "tun" ]]; then
+    $BUSYBOX sed -i "s/.*device/  device/" ${TARGET[@]} &> /dev/null
+  fi
 }
 
 port_verifier() {
   [[ -z "$1" ]] && return 1
   ss -ap | grep "$BIN_NAME" | grep -om1 "$1"
+}
+
+port_grabber() {
+  if [[ "$FORCE" == "true" ]]; then
+    dns_port="$(awk -F ':' '/listen/ {print $3}' "$CONFIG")"
+    tproxy_port="$(awk -F ':' '/tproxy-port/ {print $2}' "$CONFIG")"
+  else
+    sleep "$DELAY"
+    dns_port="$(port_verifier $(awk -F ':' '/listen/ {print $3}' "$CONFIG"))"
+    tproxy_port="$(port_verifier $(awk -F ':' '/tproxy-port/ {print $2}' "$CONFIG"))"
+  fi
+  if [[ -z "$dns_port" ]]; then
+    echo "err: dns port not present!"
+    print_notification "DNS port not present!"
+    stop_service
+   exit 1
+  fi
+  if [[ -z "$tproxy_port" ]]; then
+    echo "err: tproxy port not present!"
+    print_notification "TPROXY port not present!"
+    stop_service
+    exit 1
+  fi
 }
 
 print_notification() {
@@ -261,39 +291,21 @@ start() {
     exit 1
   fi
 
-  [[ "$FISHER" == "true" ]] && fishing
-  [[ "$MERGE_CONFIG" == "true" ]] && config_merger
+  [[ "$FISHER" == "true" ]] && fisher
+  [[ "$MERGE" == "true" ]] && config_merger
+  [[ "$FORCE" == "true" ]] && echo "warn: skip verifier."
 
   get_tun_mode
   if [[ "$tun_mode" == "true" ]]; then
     echo "info: using tun."
     tun_setup
-  else
-    port_opener
-  fi
-
-  start_service
-
-  if [[ "$tun_mode" == "true" ]]; then
+    comment_handler tun
+    start_service
     forward_device
   else
-    sleep "$DELAY"
-
-    dns_port="$(port_verifier $(awk -F ':' '/listen/ {print $3}' "$CONFIG"))"
-    if [[ -z "$dns_port" ]]; then
-      echo "err: dns port not present!"
-      print_notification "DNS port not present!"
-      stop_service
-      exit 1
-    fi
-
-    tproxy_port="$(port_verifier $(awk -F ':' '/tproxy-port/ {print $2}' "$CONFIG"))"
-    if [[ -z "$tproxy_port" ]]; then
-      echo "err: tproxy port not present!"
-      print_notification "TPROXY port not present!"
-      stop_service
-      exit 1
-    fi
+    comment_handler tproxy
+    start_service
+    port_grabber  
     echo "info: using tproxy."
     start_tproxy
   fi
@@ -310,12 +322,12 @@ stop() {
   print_notification "Services Stopped."
 }
 
-fishing() {
+fisher() {
   print_notification "Fishing..."
   echo "info: fisher begin."
   for i in ${FISH[@]}; do
     echo -n "  - $i "
-    ping -w 1 -c 1 $i &> /dev/null && echo "[Success]" || echo "[Failed]"
+    ping -W 1 -c 1 $i &> /dev/null && echo "[Success]" || echo "[Failed]"
   done
 }
 

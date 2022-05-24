@@ -15,17 +15,19 @@ Uninstall modules via Magisk Manager.
 Data directory automatically removed.
 
 ## Configuration
-Data directory at `/data/adb/ClashM`
+Data directory stored on `/data/adb/ClashM`
 
 ClashM using `config.yaml` by default
 
-Modules config in `/data/adb/modules/ClashM/scripts/clashm.config`
+Modules config at `/data/adb/modules/ClashM/scripts/clashm.config`
 
-`MERGE_CONFIG=true` will force merge between `base.yaml` and `proxies.yaml` into `config.yaml`
+`MERGE=true` will force merge between `base.yaml` and `proxies.yaml` into `config.yaml`
 
 Run/Logs directory in `/data/adb/modules/ClashM/run`
 
 ## Changelogs
+### v0.2.3
+  - add force option to skip port & tun device verifier.
 ### v0.2.2
   - Clean up.
   - Fix get TUN interface on forward device.
