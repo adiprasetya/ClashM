@@ -8,23 +8,14 @@ if [[ "$ARCH" != "arm64" ]]; then
   abort "Error: Unsupported device."
 fi
 
-# tproxy support checker
-TPROXY="$(zcat /proc/config.gz | awk -F '=' '/TPROXY/ {print $2}')"
-if [[ "$TPROXY" != "y" ]]; then
-  abort "Error: Unsupported TPROXY."
-fi
-
 DATA="/data/adb/$MODID"
-BIN="${MODPATH}/bin"
-RUN="${MODPATH}/run"
-SCRIPTS="${MODPATH}/scripts"
 SERVICE="/data/adb/service.d/${MODID}.sh"
 
 ui_print "- Data directory: $DATA"
 
 # setup environment
 if [[ -f "${DATA}/proxies.yaml" ]]; then
-  cp -f "${DATA}/proxies.yaml" "${TMPDIR}/proxies.yaml"
+  cp -f "${DATA}/proxies.yaml" "${MODPATH}/data"
 fi
 
 if [[ -d "${DATA}" ]]; then
@@ -38,20 +29,18 @@ if [[ -d "${DATA}" ]]; then
 fi
 
 mv -f "${MODPATH}/data" "${DATA}"
-mkdir -p "$BIN"
-mkdir -p "$SCRIPTS"
-mkdir -p "$RUN"
 
-if [[ -f "${TMPDIR}/proxies.yaml" ]]; then
-  cp -f "${TMPDIR}/proxies.yaml" "${DATA}/proxies.yaml"
-else
+if [[ ! -f "${DATA}/proxies.yaml" ]]; then
   cp -f "${DATA}/.example.yaml" "${DATA}/proxies.yaml"
 fi
 
-# replacing MOD ID
-sed -i "s|REPLACE|$MODID|" "$MODPATH/scripts/clashm.config"
-sed -i "s|REPLACE|$MODID|" "$MODPATH/uninstall.sh"
-sed -i "s|REPLACE|$MODID|" "$MODPATH/service.sh"
+mkdir -p "$MODPATH/run"
+
+# replacing variable
+sed -i "s|MODID|$MODID|" \
+"$MODPATH/scripts/configuration" \
+"$MODPATH/uninstall.sh" \
+"$MODPATH/service.sh"
 
 # install service.d
 mv -f "$MODPATH/service.sh" "$SERVICE"

@@ -1,0 +1,19 @@
+# Customizable
+MERGE="true" # Merge BASE and PROXIES
+BIN_NAME="clash"
+
+# Advanced
+DIR="${0%/*}"
+MODDIR="/data/adb/modules/MODID"
+DATA="/data/adb/MODID"
+CONFIG="${DATA}/config.yaml"
+BASE="${DATA}/base.yaml"
+PROXIES="${DATA}/proxies.yaml"
+
+RUN="${MODDIR}/run"
+PID_FILE="${RUN}/clash.pid"
+RUN_FILE="${RUN}/run.log"
+CORE_LOG_FILE="${RUN}/core.log"
+SCRIPTS="$MODDIR/scripts"
+BIN="$MODDIR/bin/$BIN_NAME"
+BUSYBOX="/data/adb/magisk/busybox"

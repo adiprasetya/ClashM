@@ -1,7 +1,7 @@
 #!/system/bin/sh
 
 DIR="${0%/*}"
-. "$DIR/clashm.config"
+. "$DIR/configuration"
 
 wait_until_login() {
   # in case of /data encryption is disabled

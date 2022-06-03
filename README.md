@@ -1,7 +1,11 @@
 # ClashM
 Clash (Meta) in Magisk with Services.
-  
-Not supporting IPv6 (yet).
+
+Using TUN by default.
+
+Unsupport TPROXY method.
+
+IPv6 should work fine.
 
 
 ## Installation
@@ -17,17 +21,25 @@ Data directory automatically removed.
 ## Configuration
 Data directory stored on `/data/adb/ClashM`
 
-ClashM using `config.yaml` by default
+Using `config.yaml` by default
 
-Modules config at `/data/adb/modules/ClashM/scripts/clashm.config`
+ClashM configuration at `/data/adb/modules/ClashM/scripts/configuration`
 
-`MERGE=true` will force merge between `base.yaml` and `proxies.yaml` into `config.yaml`
+`MERGE=true` will force merge `base.yaml` and `proxies.yaml` into `config.yaml`
 
-Run/Logs directory in `/data/adb/modules/ClashM/run`
+Run/Logs directory stored on `/data/adb/modules/ClashM/run`
 
 ## Changelogs
+### v1.0.0
+  - removed TPROXY iptables support.
+  - removed useless/bloated features.
+  - rename `clashm.config` to `configuration`
+  - cleaning up code.
+  - removed `geo-database` on zip installer.
+
 ### v0.2.3
-  - add force option to skip port & tun device verifier.
+  - Add force option to skip port & tun device verifier.
+
 ### v0.2.2
   - Clean up.
   - Fix get TUN interface on forward device.

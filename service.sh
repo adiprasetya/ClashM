@@ -1,6 +1,6 @@
 #!/system/bin/sh
 
-MODDIR="/data/adb/modules/REPLACE"
+MODDIR="/data/adb/modules/MODID"
 SCRIPTS="$MODDIR/scripts"
 
 until [[ $(getprop sys.boot_completed) -eq 1 ]] ; do

@@ -1,9 +1,9 @@
 remove_data_dir() {
-  rm -rf /data/adb/REPLACE
+  rm -rf /data/adb/MODID
 }
 
 remove_service() {
-  rm -f /data/adb/service.d/REPLACE.sh
+  rm -f /data/adb/service.d/MODID.sh
 }
 
 remove_data_dir

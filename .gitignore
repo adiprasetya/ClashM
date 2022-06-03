@@ -3,7 +3,6 @@ build.sh
 bin
 
 # data
-proxies.yaml
 *.mmdb
 *.dat
 dashboard

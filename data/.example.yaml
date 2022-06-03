@@ -61,5 +61,5 @@ proxy-groups:
       - REJECT
 
 rules:
-  - GEOSITE,category-ads-all,REJECT
+  # - GEOSITE,category-ads-all,REJECT
   - MATCH,PROXY
