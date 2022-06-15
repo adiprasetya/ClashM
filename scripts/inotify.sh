@@ -2,7 +2,7 @@
 
 DIR="${0%/*}"
 . "$DIR/configuration"
-CLASHM="$SCRIPTS/clashm.sh"
+CLASHM="$SCRIPTS/main.sh"
 LOG="${RUN}/run.log"
 
 events=$1

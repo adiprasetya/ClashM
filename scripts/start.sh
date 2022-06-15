@@ -22,7 +22,7 @@ wait_until_login() {
 start_service() {
   echo "true" > ${RUN_FILE}
   chmod 644 ${RUN_FILE}
-  ${SCRIPTS}/clashm.sh start &> "$RUN_FILE"
+  ${SCRIPTS}/main.sh start &> "$RUN_FILE"
 }
 
 wait_until_login
