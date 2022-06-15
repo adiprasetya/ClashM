@@ -9,7 +9,7 @@ IPv6 should work fine.
 
 
 ## Installation
-Download installer zip file from releases.
+Download installer zip file from [releases](https://github.com/adiprasetya/ClashM/releases).
 
 Install it via Magisk Manager.
 
@@ -30,6 +30,10 @@ ClashM configuration at `/data/adb/modules/ClashM/scripts/configuration`
 Run/Logs directory stored on `/data/adb/modules/ClashM/run`
 
 ## Changelogs
+### v1.0.1
+  - change dashboard to [YACD MetaCubeX](https://github.com/MetaCubeX/yacd)
+  - update meta core
+
 ### v1.0.0
   - removed TPROXY iptables support.
   - removed useless/bloated features.
