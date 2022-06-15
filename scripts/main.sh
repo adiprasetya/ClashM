@@ -27,8 +27,7 @@ start_service() {
     exit 1
   fi
 
-  echo "Date: $(date +%F)" > ${CORE_LOG_FILE}
-  echo "Time: $(date +%R)" >> ${CORE_LOG_FILE}
+  date "+%A, %d %B %Y | %R %Z" > ${CORE_LOG_FILE}
   echo >> ${CORE_LOG_FILE}
   ulimit -SHn 1000000
   nohup ${BUSYBOX} setuidgid 0:3005 \
@@ -45,7 +44,7 @@ stop_service() {
 }
 
 
-tun_setup() {
+setup_tun() {
   mkdir -p /dev/net
   if [[ ! -L /dev/net/tun ]]; then 
     ln -sf /dev/tun /dev/net/tun
@@ -53,22 +52,32 @@ tun_setup() {
 }
 
 merger() {
-  [[ "$MERGE" == "true" ]] || return
-  echo "info: force merge."
-  cp -f "$BASE" "$CONFIG"
-  echo >> "$CONFIG"
-  cat "$PROXIES" >> "$CONFIG"
+  if [[ "$MERGE" == "true" ]]; then
+    echo "info: force merge."
+    cp -f "$BASE" "$CONFIG"
+    echo >> "$CONFIG"
+    cat "$PROXIES" >> "$CONFIG"
+  fi
 }
 
-forward_device() {
-  device="$(awk '/device/ {print $2}' "$CONFIG")"
+hotspot() {
+  device="$(awk '/device:/ {print $2}' "$CONFIG")"
   interface=(utun Meta $device)
-  for i in ${interface[@]}; do
-    iptables -I FORWARD -o "$i" -j ACCEPT
-    iptables -I FORWARD -i "$i" -j ACCEPT
-    ip6tables -I FORWARD -o "$i" -j ACCEPT
-    ip6tables -I FORWARD -i "$i" -j ACCEPT
-  done
+  if [[ "$HOTSPOT" == "true" ]]; then
+    for i in ${interface[@]}; do
+      iptables -I FORWARD -o "$i" -j ACCEPT
+      iptables -I FORWARD -i "$i" -j ACCEPT
+      ip6tables -I FORWARD -o "$i" -j ACCEPT
+      ip6tables -I FORWARD -i "$i" -j ACCEPT
+    done
+  else
+    for i in ${interface[@]}; do
+      iptables -I FORWARD -o "$i" -j REJECT
+      iptables -I FORWARD -i "$i" -j REJECT
+      ip6tables -I FORWARD -o "$i" -j REJECT
+      ip6tables -I FORWARD -i "$i" -j REJECT
+    done
+  fi
 }
 
 
@@ -80,9 +89,9 @@ start() {
   fi
 
   merger
-  tun_setup
+  setup_tun
   start_service
-  forward_device
+  hotspot
 }
 
 

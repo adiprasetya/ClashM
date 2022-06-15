@@ -1,3 +1,9 @@
+# Documentation
+#   https://github.com/Dreamacro/clash/wiki/configuration
+#   https://github.com/Dreamacro/clash/wiki/premium-core-features
+#   https://lancellc.gitbook.io/clash
+#   https://docs.metacubex.one/
+
 mode: rule
 # ipv6: false # when set to false, resolver won't translate hostnames to IPv6 addresses
 # tcp-concurrent: true
@@ -5,6 +11,12 @@ mode: rule
 external-controller: 127.0.0.1:9090
 external-ui: dashboard
 log-level: silent
+
+sniffer:
+  enable: false
+  sniffing:
+    - tls
+    - http
 
 dns:
   enable: true

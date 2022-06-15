@@ -1,5 +1,6 @@
 # Customizable
 MERGE="true" # Merge BASE and PROXIES
+HOTSPOT="true"
 BIN_NAME="clash"
 
 # Advanced

@@ -16,6 +16,8 @@ ui_print "- Data directory: $DATA"
 # setup environment
 if [[ -f "${DATA}/proxies.yaml" ]]; then
   cp -f "${DATA}/proxies.yaml" "${MODPATH}/data"
+else 
+  cp -f "${MODPATH}/data/.example.yaml" "${MODPATH}/data/proxies.yaml"
 fi
 
 if [[ -d "${DATA}" ]]; then
@@ -29,10 +31,6 @@ if [[ -d "${DATA}" ]]; then
 fi
 
 mv -f "${MODPATH}/data" "${DATA}"
-
-if [[ ! -f "${DATA}/proxies.yaml" ]]; then
-  cp -f "${DATA}/.example.yaml" "${DATA}/proxies.yaml"
-fi
 
 mkdir -p "$MODPATH/run"
 
