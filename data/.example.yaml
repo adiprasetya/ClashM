@@ -52,6 +52,16 @@ proxies:
       headers:
         Host: example.com
 
+proxy-providers:
+  local:
+    type: file
+    path: ./.example.yaml
+    url: 'https://remote-url.com'
+    interval: 3600
+    health-check:
+      enable: false
+      url: 'http://www.gstatic.com/generate_204'
+      interval: 300
 
 proxy-groups:
   - name: PROXY
@@ -61,5 +71,4 @@ proxy-groups:
       - REJECT
 
 rules:
-  # - GEOSITE,category-ads-all,REJECT
   - MATCH,PROXY

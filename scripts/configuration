@@ -1,20 +1,21 @@
 # Customizable
-MERGE="true" # Merge BASE and PROXIES
-HOTSPOT="true"
-BIN_NAME="clash"
+HOTSPOT="ACCEPT" # or REJECT
+BIN_NAME="meta"
 
 # Advanced
 DIR="${0%/*}"
 MODDIR="/data/adb/modules/MODID"
 DATA="/data/adb/MODID"
-CONFIG="${DATA}/config.yaml"
-BASE="${DATA}/base.yaml"
-PROXIES="${DATA}/proxies.yaml"
+BASE="$DATA/base.yaml"
+CONFIG="$DATA/config.yaml"
+TEMPORARY="$DATA/.temporary.yaml"
 
-RUN="${MODDIR}/run"
-PID_FILE="${RUN}/clash.pid"
-RUN_FILE="${RUN}/run.log"
-CORE_LOG_FILE="${RUN}/core.log"
+
+RUN="$MODDIR/run"
+PID_FILE="$RUN/clash.pid"
+RUN_FILE="$RUN/run.log"
+CORE_LOG_FILE="$RUN/core.log"
 SCRIPTS="$MODDIR/scripts"
-BIN="$MODDIR/bin/$BIN_NAME"
+BIN_DIR="$MODDIR/bin"
+BIN="$BIN_DIR/$BIN_NAME"
 BUSYBOX="/data/adb/magisk/busybox"

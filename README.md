@@ -19,9 +19,9 @@
 ---
 ## Configuration
   - Data directory stored on `/data/adb/ClashM`
-  - Using `config.yaml` by default
+  - `base.yaml` base configuration.
+  - `config.yaml` proxies configuration.
   - ClashM configuration at `/data/adb/modules/ClashM/scripts/configuration`
-  - `MERGE=true` will force merge `base.yaml` and `proxies.yaml` into `config.yaml`
   - Run directory stored on `/data/adb/modules/ClashM/run`
 
 ---

@@ -1,51 +1,54 @@
-# installer checker
-if [[ $BOOTMODE != true ]]; then
-  abort "Error: Install in Magisk Manager."
+
+if [[ "$BOOTMODE" != true ]]; then
+  abort "Install in Magisk Manager!"
 fi
 
-# device support checker
-if [[ "$ARCH" != "arm64" ]]; then
-  abort "Error: Unsupported device."
+BIN="$MODPATH/bin"
+if [[ "$ARCH" == "arm" ]]; then
+  ui_print "- Your devices isn't 64bit. PROCESS-NAME rules won't work"
 fi
+
+mv -f "$BIN/$ARCH" "$BIN/meta"
+rm -f "$BIN/arm"*
 
 DATA="/data/adb/$MODID"
 SERVICE="/data/adb/service.d/${MODID}.sh"
 
+ui_print "- Setup environment"
+if [[ -f "$DATA/config.yaml" ]]; then
+  cp -f "$DATA/config.yaml" "$MODPATH/data"
+else 
+  cp -f "$MODPATH/data/.example.yaml" "$MODPATH/data/config.yaml"
+fi
+
+
+DATE="$(date "+%F")"
+if [[ -d "$DATA" ]]; then
+  ui_print "- Old data directory exists,"
+  ui_print "  Moved to $DATA.$DATE"
+  if [[ -d "$DATA.$DATE" ]]; then
+    ui_print "- Old $MODID.$DATE will replaced"
+    rm -rf "$DATA.$DATE"
+  fi
+  mv -f "$DATA" "$DATA.$DATE"
+fi
+
+mv -f "$MODPATH/data" "$DATA"
+mkdir -p "$MODPATH/run"
 ui_print "- Data directory: $DATA"
 
-# setup environment
-if [[ -f "${DATA}/proxies.yaml" ]]; then
-  cp -f "${DATA}/proxies.yaml" "${MODPATH}/data"
-else 
-  cp -f "${MODPATH}/data/.example.yaml" "${MODPATH}/data/proxies.yaml"
-fi
-
-if [[ -d "${DATA}" ]]; then
-  ui_print "- Old data directory exists,"
-  ui_print "  Moved to ${DATA}.bak"
-  if [[ -d "${DATA}.bak" ]]; then
-    ui_print "- Old $MODID.bak will replaced."
-    rm -rf "${DATA}.bak"
-  fi
-  mv -f "${DATA}" "${DATA}.bak"
-fi
-
-mv -f "${MODPATH}/data" "${DATA}"
-
-mkdir -p "$MODPATH/run"
-
-# replacing variable
+ui_print "- Replacing variable"
 sed -i "s|MODID|$MODID|" \
 "$MODPATH/scripts/configuration" \
 "$MODPATH/uninstall.sh" \
 "$MODPATH/service.sh"
 
-# install service.d
+ui_print "- Installing service script"
 mv -f "$MODPATH/service.sh" "$SERVICE"
 
-# set environment permission
-set_perm_recursive "${MODPATH}" 0 0 0755 0644
-set_perm_recursive "${DATA}" 0 0 0644 0644
-set_perm_recursive "${MODPATH}/scripts" 0 3005 0755 0755
-set_perm_recursive "${MODPATH}/bin" 0 3005 0755 0755
-set_perm_recursive "${SERVICE}" 0 0 0755 0755
+ui_print "- Set environment permission"
+set_perm_recursive "$MODPATH" 0 0 0755 0644
+set_perm_recursive "$DATA" 0 0 0644 0644
+set_perm_recursive "$MODPATH/scripts" 0 3005 0755 0755
+set_perm_recursive "$MODPATH/bin" 0 3005 0755 0755
+set_perm_recursive "$SERVICE" 0 0 0755 0755

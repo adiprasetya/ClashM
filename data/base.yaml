@@ -2,27 +2,23 @@
 #   https://github.com/Dreamacro/clash/wiki/configuration
 #   https://github.com/Dreamacro/clash/wiki/premium-core-features
 #   https://lancellc.gitbook.io/clash
-#   https://docs.metacubex.one/
+#   https://docs.metacubex.one
 
-mode: rule
 # ipv6: false # when set to false, resolver won't translate hostnames to IPv6 addresses
-# tcp-concurrent: true
-# geodata-mode: true
 external-controller: 127.0.0.1:9090
 external-ui: dashboard
+# secret: ''
 log-level: silent
-
-sniffer:
-  enable: false
-  sniffing:
-    - tls
-    - http
+# tcp-concurrent: true
+# geodata-mode: true
+# unified-delay: true
+# enable-process: true
 
 dns:
   enable: true
   # listen: 0.0.0.0:53
   # ipv6: false # when set to false, response to AAAA questions will be empty
-  enhanced-mode: fake-ip # redir-host # (not recommended)
+  enhanced-mode: fake-ip # or redir-host
   # fake-ip-range: 198.18.0.1/16 # Fake IP addresses pool CIDR
   # use-hosts: true # lookup hosts and return IP record
   nameserver:
@@ -35,7 +31,13 @@ tun:
   enable: true
   stack: system # or gvisor
   device: ClashM
-  dns-hijack:
-    - any:53
+  # dns-hijack:
+    # - any:53
   auto-route: true # auto set global route
   auto-detect-interface: true # conflict with interface-name
+
+sniffer:
+  enable: false
+  sniffing:
+    - tls
+    - http

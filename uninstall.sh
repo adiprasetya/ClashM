@@ -1,5 +1,5 @@
 remove_data_dir() {
-  rm -rf /data/adb/MODID
+  rm -rf /data/adb/MODID*
 }
 
 remove_service() {

@@ -2,19 +2,18 @@
 
 DIR="${0%/*}"
 . "$DIR/configuration"
-CLASHM="$SCRIPTS/main.sh"
-LOG="${RUN}/run.log"
+MAIN="$SCRIPTS/main.sh"
 
 events=$1
 monitor_dir=$2
 monitor_file=$3
 
 service_control() {
-    if [[ "${monitor_file}" == "disable" ]]; then
-        if [[ "${events}" == "d" ]]; then
-            ${CLASHM} start &> "$LOG"
-        elif [[ "${events}" == "n" ]]; then
-            ${CLASHM} stop &> "$LOG"
+    if [[ "$monitor_file" == "disable" ]]; then
+        if [[ "$events" == "d" ]]; then
+            "$MAIN" start &> "$RUN_FILE"
+        elif [[ "$events" == "n" ]]; then
+            "$MAIN" stop &> "$RUN_FILE"
         fi
     fi
 }

@@ -1,5 +1,11 @@
 ---
 ## Changelogs
+  - v1.2.0
+    - Removed `MERGE`.
+    - New algorithm.
+    - Add binary for arm32.
+    - Update core.
+
   - v1.1.0
     - Allow hotspot connection toggle in configuration file (default true).
     - Rename clashm.sh to main.sh.
