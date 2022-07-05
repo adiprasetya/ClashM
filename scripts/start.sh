@@ -30,8 +30,8 @@ wait_until_login
 rm -f "$PID_FILE"
 chmod -R 0755 "$SCRIPTS"
 
-if [[ ! -f "$DIR/manual" ]]; then
-  if [[ ! -f "$DIR/disable" ]]; then
+if [[ ! -f "$MODDIR/manual" ]]; then
+  if [[ ! -f "$MODDIR/disable" ]]; then
     start_service
   fi
   inotifyd "$SCRIPTS/inotify.sh" "$MODDIR" &> /dev/null &
