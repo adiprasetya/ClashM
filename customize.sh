@@ -3,16 +3,21 @@ if [[ "$BOOTMODE" != true ]]; then
   abort "Install in Magisk Manager!"
 fi
 
+if [[ "$ARCH" != "arm"* ]]; then
+  abort "Only for arm devices!"
+fi
+
 BIN="$MODPATH/bin"
-if [[ "$ARCH" == "arm" ]]; then
+if [[ "$IS64BIT" != "true" ]]; then
   ui_print "- Your devices isn't 64bit. PROCESS-NAME rules won't work"
 fi
 
+# gunzip "$BIN/$ARCH.gz"
 mv -f "$BIN/$ARCH" "$BIN/meta"
-rm -f "$BIN/arm"*
+rm -f "$BIN/"*.gz
 
 DATA="/data/adb/$MODID"
-SERVICE="/data/adb/service.d/${MODID}.sh"
+SERVICE="/data/adb/service.d/$MODID.sh"
 
 ui_print "- Setup environment"
 if [[ -f "$DATA/config.yaml" ]]; then

@@ -1,5 +1,9 @@
 ---
 ## Changelogs
+  - v1.2.1
+    - Add conditions on customize.sh.
+    - Fix typo on start.sh.
+
   - v1.2.0
     - Removed `MERGE`.
     - New algorithm.
