@@ -1,10 +1,7 @@
 # ClashM
-
----
-## Overview
-  - Clash (Meta) in Magisk with Services.
-  - Using TUN by default. Unsupport TPROXY method.
-  - IPv6 should work fine.
+ Clash (Meta) in Magisk with Services.
+ 
+ Official Telegram Channel [@ClashM_Magisk](https://t.me/ClashM_Magisk).
 
 ---
 ## Installation
@@ -26,10 +23,11 @@
 
 ---
 ## Credits
-  - [@Dreamacro](https://github.com/Dreamacro) / [clash](https://github.com/Dreamacro/clash)
-  - [@MetaCubeX](https://github.com/MetaCubeX) / [Clash.Meta](https://github.com/MetaCubeX/Clash.Meta)
-  - [@haishanh](https://github.com/haishanh) / [yacd](https://github.com/haishanh/yacd)
-  - [@kalasutra](https://github.com/kalasutra) / [Clash for Magisk](https://github.com/kalasutra/Clash_For_Magisk)
-  - [@Asterisk4Magisk](https://github.com/Asterisk4Magisk) / [Xray4Magisk](https://github.com/Asterisk4Magisk/Xray4Magisk)
-  - [@e58695](https://t.me/e58695) / Base
+  - [@topjohnwu](https://github.com/topjohnwu) / Magisk
+  - [@Dreamacro](https://github.com/Dreamacro) / clash
+  - [@MetaCubeX](https://github.com/MetaCubeX) / Clash.Meta
+  - [@haishanh](https://github.com/haishanh) / yacd
+  - [@kalasutra](https://github.com/kalasutra) / Clash for Magisk
+  - [@Asterisk4Magisk](https://github.com/Asterisk4Magisk) / Xray4Magisk
+  - [@e58695](https://t.me/e58695)
   
