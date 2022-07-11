@@ -1,7 +1,7 @@
 id=ClashM
 name=ClashM
-version=1.2.1
-versionCode=20220706
+version=1.2.2
+versionCode=20220711
 author=adiprasetya
 description=Clash (Meta) in Magisk with Services.
 updateJson=https://raw.githubusercontent.com/adiprasetya/ClashM/main/module.json

@@ -11,9 +11,9 @@ monitor_file=$3
 service_control() {
     if [[ "$monitor_file" == "disable" ]]; then
         if [[ "$events" == "d" ]]; then
-            "$MAIN" start &> "$RUN_FILE"
+            "$MAIN" start &> "$RUN_LOG"
         elif [[ "$events" == "n" ]]; then
-            "$MAIN" stop &> "$RUN_FILE"
+            "$MAIN" stop &> "$RUN_LOG"
         fi
     fi
 }

@@ -10,11 +10,13 @@ BASE="$DATA/base.yaml"
 CONFIG="$DATA/config.yaml"
 TEMPORARY="$DATA/.temporary.yaml"
 
-
+# Logs
 RUN="$MODDIR/run"
 PID_FILE="$RUN/clash.pid"
-RUN_FILE="$RUN/run.log"
+RUN_LOG="$RUN/run.log"
 CORE_LOG_FILE="$RUN/core.log"
+
+# Variables
 SCRIPTS="$MODDIR/scripts"
 BIN_DIR="$MODDIR/bin"
 BIN="$BIN_DIR/$BIN_NAME"

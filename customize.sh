@@ -1,23 +1,24 @@
-
 if [[ "$BOOTMODE" != true ]]; then
   abort "Install in Magisk Manager!"
 fi
 
 if [[ "$ARCH" != "arm"* ]]; then
-  abort "Only for arm devices!"
+  abort "- Only for arm devices!"
 fi
 
-BIN="$MODPATH/bin"
 if [[ "$IS64BIT" != "true" ]]; then
   ui_print "- Your devices isn't 64bit. PROCESS-NAME rules won't work"
 fi
 
-# gunzip "$BIN/$ARCH.gz"
-mv -f "$BIN/$ARCH" "$BIN/meta"
-rm -f "$BIN/"*.gz
-
+# variables
+BIN="$MODPATH/bin"
 DATA="/data/adb/$MODID"
 SERVICE="/data/adb/service.d/$MODID.sh"
+DATE="$(date "+%F")"
+
+# rename binary
+mv -f "$BIN/$ARCH" "$BIN/meta"
+rm -f "$BIN/arm"*
 
 ui_print "- Setup environment"
 if [[ -f "$DATA/config.yaml" ]]; then
@@ -26,8 +27,6 @@ else
   cp -f "$MODPATH/data/.example.yaml" "$MODPATH/data/config.yaml"
 fi
 
-
-DATE="$(date "+%F")"
 if [[ -d "$DATA" ]]; then
   ui_print "- Old data directory exists,"
   ui_print "  Moved to $DATA.$DATE"
@@ -38,9 +37,9 @@ if [[ -d "$DATA" ]]; then
   mv -f "$DATA" "$DATA.$DATE"
 fi
 
+ui_print "- Data directory: $DATA"
 mv -f "$MODPATH/data" "$DATA"
 mkdir -p "$MODPATH/run"
-ui_print "- Data directory: $DATA"
 
 ui_print "- Replacing variable"
 sed -i "s|MODID|$MODID|" \

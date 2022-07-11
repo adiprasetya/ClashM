@@ -1,5 +1,8 @@
 ---
 ## Changelogs
+  - v1.2.2
+    - Fix typo on customize.sh
+
   - v1.2.1
     - Add conditions on customize.sh.
     - Fix typo on start.sh.
