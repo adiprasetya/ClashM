@@ -1,8 +1,10 @@
-# ClashM
+# ClashM (discontinued)
+ **Project discontinued. use [Clash4Magisk](https://github.com/Kry9toN/Clash4Magisk) instead.**
+ 
  Clash (Meta) in Magisk with Services.
  
- Official Telegram Channel [@ClashM_Magisk](https://t.me/ClashM_Magisk).
-
+ ~~Official Telegram Channel [@ClashM_Magisk](https://t.me/ClashM_Magisk).~~
+ 
 ---
 ## Installation
   - Download installer zip file from [releases](https://github.com/adiprasetya/ClashM/releases).
